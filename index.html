@@ -7,16 +7,16 @@
 header{background:#13233b;color:white;padding:25px max(20px,calc((100vw - 1400px)/2)) 22px}
 header h1{font-size:26px;margin:0 0 5px}header p{margin:0;color:#cbd5e1}
 main{max-width:1400px;margin:20px auto;padding:0 18px 40px}.notice{background:#fff8e7;border:1px solid #f0d89a;padding:12px 14px;border-radius:10px;margin-bottom:16px;color:#6b4d0c}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;box-shadow:0 1px 2px #0f172a08}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;box-shadow:0 1px 2px #0f172a08}
 .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}.big{font-size:26px;font-weight:750;margin-top:4px}.sub{font-size:12px;color:var(--muted)}
 .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.control{display:flex;flex-direction:column;gap:5px}.control label{font-size:12px;font-weight:650;color:var(--muted)}
 input,select,button{font:inherit;border:1px solid #cbd5e1;border-radius:8px;padding:9px 11px;background:white;color:var(--ink)}button{cursor:pointer;font-weight:650}button.primary{background:#183b65;color:white;border-color:#183b65}button:hover{filter:brightness(.97)}
 .section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0 10px}.section-head h2{font-size:17px;margin:0}
 .charts{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}.chart{min-height:240px}.barrow{display:grid;grid-template-columns:110px 1fr 60px;gap:8px;align-items:center;margin:11px 0;font-size:12px}.track{height:12px;background:#eef2f7;border-radius:99px;overflow:hidden;display:flex}.dem{background:var(--blue)}.rep{background:var(--red)}.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
 .tablewrap{overflow:auto;max-height:650px;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;background:white;font-variant-numeric:tabular-nums;white-space:nowrap}th,td{text-align:right;padding:9px 10px;border-bottom:1px solid #edf0f4}th{position:sticky;top:0;background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase;letter-spacing:.04em;z-index:1}th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:inherit}tbody tr:hover{background:#f8fbff}td:first-child{font-weight:650}
-.pos{color:var(--red);font-weight:700}.neg{color:var(--blue);font-weight:700}.pending{color:#94a3b8}
+.pos{color:var(--red);font-weight:700}.neg{color:var(--blue);font-weight:700}.pending{color:#94a3b8}.progresscell{display:inline-flex;align-items:center;gap:7px;min-width:104px}.progressbar{display:inline-block;width:48px;height:7px;border-radius:99px;background:#e8edf3;overflow:hidden}.progressbar i{display:block;height:100%;background:var(--green);border-radius:99px}
 small{color:var(--muted)}.source{margin-top:16px;color:var(--muted);font-size:12px}.source a{color:#245f9d}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}}@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.big{font-size:22px}}
+@media(max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}}@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.big{font-size:22px}}
 </style></head><body>
 <header><h1>Georgia Governor Election Comparison</h1><p>2018 · 2022 · 2026 | All 159 counties | County margin shifts and live returns</p></header>
 <main>
@@ -24,6 +24,7 @@ small{color:var(--muted)}.source{margin-top:16px;color:var(--muted);font-size:12
 <div class="grid">
  <div class="card"><div class="kicker">Counties in tracker</div><div class="big" id="countyCount">159</div><div class="sub">Full Georgia county list</div></div>
  <div class="card"><div class="kicker">2026 counties with data</div><div class="big" id="reporting">0 / 159</div><div class="sub" id="reportingSub">No county returns loaded</div></div>
+ <div class="card"><div class="kicker">2026 precincts reporting</div><div class="big" id="statePrecinctPct">—</div><div class="sub" id="statePrecincts">Precinct totals not yet available</div></div>
  <div class="card"><div class="kicker">2026 statewide two-party margin</div><div class="big" id="stateMargin">—</div><div class="sub">Calculated from imported county votes</div></div>
  <div class="card"><div class="kicker">Largest county swing</div><div class="big" id="largestSwing">—</div><div class="sub" id="largestSwingSub">Requires 2022 and 2026 data</div></div>
 </div>
@@ -36,14 +37,14 @@ small{color:var(--muted)}.source{margin-top:16px;color:var(--muted);font-size:12
   <button class="primary" id="export">Export combined CSV</button>
   <button id="reset">Clear imported data</button>
  </div>
- <p class="sub">Required headers: <code>County,RepVotes,DemVotes</code>. Optional: <code>OtherVotes,PrecinctsReporting,PrecinctsTotal</code>. County names are matched case-insensitively. Blank/missing counties remain pending.</p>
+ <p class="sub">Required headers: <code>County,RepVotes,DemVotes</code>. Optional: <code>OtherVotes,PrecinctsReporting,PrecinctsTotal</code>. Reporting % is calculated as precincts reporting ÷ total precincts; it is not the percentage of votes counted. County names are matched case-insensitively.</p>
 </div>
 <div class="charts">
  <div class="card chart"><div class="section-head" style="margin-top:0"><h2>Statewide two-party vote share</h2><small>Imported county totals</small></div><div id="shareChart"><p class="sub">Import historical and/or current county CSVs to populate this chart.</p></div><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Democratic</span><span><i class="dot" style="background:var(--red)"></i>Republican</span></div></div>
  <div class="card chart"><div class="section-head" style="margin-top:0"><h2>Largest county margin shifts</h2><small>2026 vs. 2022</small></div><div id="swingChart"><p class="sub">Requires 2022 and 2026 county data.</p></div><small>Positive = movement toward Republicans; negative = movement toward Democrats.</small></div>
 </div>
 <div class="section-head"><h2>County-by-county comparison</h2><div class="controls"><div class="control"><label for="search">Find county</label><input id="search" placeholder="e.g. Cobb"></div><div class="control"><label for="filter">Filter</label><select id="filter"><option value="all">All counties</option><option value="reported">2026 data loaded</option><option value="pending">2026 pending</option><option value="demshift">Shifted Democratic</option><option value="repshift">Shifted Republican</option></select></div></div></div>
-<div class="tablewrap"><table><thead><tr><th>County</th><th>2018 R margin</th><th>2022 R margin</th><th>2026 R margin</th><th>2022→26 swing</th><th>2026 leader</th><th>2026 R votes</th><th>2026 D votes</th><th>Precincts</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>County</th><th>2018 R margin</th><th>2022 R margin</th><th>2026 R margin</th><th>2022→26 swing</th><th>2026 leader</th><th>2026 R votes</th><th>2026 D votes</th><th>Reporting %</th><th>Precincts reporting</th></tr></thead><tbody id="rows"></tbody></table></div>
 <div class="source">
 <b>Sources:</b> <a href="https://sos.ga.gov/page/historical-elections-results" target="_blank" rel="noopener">Georgia Secretary of State historical election downloads</a> · <a href="https://www.ajc.com/politics/georgia-election-results/county-lookup/" target="_blank" rel="noopener">AJC 2026 county results</a> · <a href="https://www.gpb.org/news/2026/11/03/live-georgias-2026-midterm-election-results-and-updates" target="_blank" rel="noopener">Georgia Public Broadcasting live coverage</a>.
 <br><br>Method: Republican margin = Republican two-party share minus Democratic two-party share. Swing = 2026 margin minus 2022 margin. Third-party votes are excluded from the two-party margin denominator. 2018 and 2022 historical totals should be certified against the Secretary of State files before publication.
@@ -60,7 +61,7 @@ function parseCSV(s){
  const idx=(...names)=>h.findIndex(x=>names.includes(x));
  const ci=idx("county","countyname"),ri=idx("repvotes","republicanvotes","republican","gopvotes"),di=idx("demvotes","democraticvotes","democrat","demvotes"),oi=idx("othervotes","thirdpartyvotes","other"),pi=idx("precinctsreporting","reportingprecincts"),ti=idx("precinctstotal","totalprecincts");
  if(ci<0||ri<0||di<0)throw Error("CSV needs County, RepVotes and DemVotes columns.");
- return lines.slice(1).map(line=>{let a=split(line),num=i=>i<0?null:Number((a[i]||"").replace(/[$,%\s]/g,""))||0;return {county:a[ci],r:num(ri),d:num(di),o:num(oi),p:pi<0?null:num(pi),t:ti<0?null:num(ti)}}).filter(x=>x.county);
+ return lines.slice(1).map(line=>{let a=split(line),num=i=>i<0||!a[i]||!a[i].trim()?null:Number(a[i].replace(/[$,%\s]/g,""));return {county:a[ci],r:num(ri)??0,d:num(di)??0,o:num(oi)??0,p:num(pi),t:num(ti)}}).filter(x=>x.county);
 }
 function margin(x){if(!x||x.r+x.d===0)return null;return (x.r-x.d)/(x.r+x.d)*100}
 function pct(x){if(!x||x.r+x.d===0)return null;return {r:x.r/(x.r+x.d)*100,d:x.d/(x.r+x.d)*100}}
@@ -71,6 +72,10 @@ function render(){
  const loaded=Object.keys(data[2026]).length;document.getElementById("reporting").textContent=loaded+" / 159";
  document.getElementById("reportingSub").textContent=loaded? "Counties with imported returns":"No county returns loaded";
  const sums=y=>Object.values(data[y]).reduce((a,x)=>({r:a.r+x.r,d:a.d+x.d}),{r:0,d:0});
+ const precinctTotals=Object.values(data[2026]).reduce((a,x)=>({p:a.p+(Number.isFinite(x.p)?x.p:0),t:a.t+(Number.isFinite(x.t)?x.t:0)}),{p:0,t:0});
+ const hasPrecinctTotals=Object.values(data[2026]).some(x=>Number.isFinite(x.p)&&Number.isFinite(x.t)&&x.t>0);
+ document.getElementById("statePrecinctPct").textContent=hasPrecinctTotals?(precinctTotals.p/precinctTotals.t*100).toFixed(1)+"%":"—";
+ document.getElementById("statePrecincts").textContent=hasPrecinctTotals?nfmt(precinctTotals.p)+" of "+nfmt(precinctTotals.t)+" precincts":"Precinct totals not yet available";
  const s26=sums("2026"),m=margin(s26);document.getElementById("stateMargin").textContent=m==null?"—":fmt(m);
  let swings=counties.map(c=>({c,v:margin(data[2026][c])==null||margin(data[2022][c])==null?null:margin(data[2026][c])-margin(data[2022][c])})).filter(x=>x.v!=null);
  swings.sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));document.getElementById("largestSwing").textContent=swings.length?swings[0].c:"—";document.getElementById("largestSwingSub").textContent=swings.length?fmt(swings[0].v)+" toward "+(swings[0].v>0?"Republicans":"Democrats"):"Requires 2022 and 2026 data";
@@ -78,12 +83,14 @@ function render(){
  document.getElementById("swingChart").innerHTML=swings.length?swings.slice(0,7).map(x=>`<div class="barrow"><b>${x.c}</b><div class="track"><div style="width:${Math.min(100,Math.abs(x.v)/80*100)}%;background:${x.v>0?'var(--red)':'var(--blue)'}"></div></div><span>${fmt(x.v)}</span></div>`).join(""):'<p class="sub">Requires 2022 and 2026 county data.</p>';
  let q=document.getElementById("search").value.toLowerCase(),f=document.getElementById("filter").value;
  let html=counties.filter(c=>c.toLowerCase().includes(q)).filter(c=>{let s=data[2026][c],v=s&&data[2022][c]?margin(s)-margin(data[2022][c]):null;return f==="all"||(f==="reported"&&!!s)||(f==="pending"&&!s)||(f==="demshift"&&v!=null&&v<0)||(f==="repshift"&&v!=null&&v>0)}).map(c=>{
- let a=margin(data[2018][c]),b=margin(data[2022][c]),z=margin(data[2026][c]),sw=b==null||z==null?null:z-b,x=data[2026][c],leader=z==null?"Pending":z>0?"Republican":z<0?"Democratic":"Tie",p=x&&x.p!=null&&x.t!=null?x.p+"/"+x.t:"—";
- return `<tr><td>${c}</td><td>${fmt(a)}</td><td>${fmt(b)}</td><td>${fmt(z)}</td><td class="${sw==null?'pending':sw>0?'pos':'neg'}">${fmt(sw)}</td><td>${leader}</td><td>${x?nfmt(x.r):"—"}</td><td>${x?nfmt(x.d):"—"}</td><td>${p}</td></tr>`
- }).join("");document.getElementById("rows").innerHTML=html||'<tr><td colspan="9">No counties match this filter.</td></tr>';
+ let a=margin(data[2018][c]),b=margin(data[2022][c]),z=margin(data[2026][c]),sw=b==null||z==null?null:z-b,x=data[2026][c],leader=z==null?"Pending":z>0?"Republican":z<0?"Democratic":"Tie",p=x&&x.p!=null&&x.t!=null?x.p+"/"+x.t:"—",rp=x&&x.p!=null&&x.t!=null&&x.t>0?(x.p/x.t*100):null;
+ const reporting=rp==null?"—":`${rp.toFixed(1)}%`;
+ const progress=rp==null?'<span class="pending">—</span>':`<span class="progresscell"><span class="progressbar"><i style="width:${Math.max(0,Math.min(100,rp))}%"></i></span><b>${reporting}</b></span>`;
+ return `<tr><td>${c}</td><td>${fmt(a)}</td><td>${fmt(b)}</td><td>${fmt(z)}</td><td class="${sw==null?'pending':sw>0?'pos':'neg'}">${fmt(sw)}</td><td>${leader}</td><td>${x?nfmt(x.r):"—"}</td><td>${x?nfmt(x.d):"—"}</td><td>${progress}</td><td>${p}</td></tr>`
+ }).join("");document.getElementById("rows").innerHTML=html||'<tr><td colspan="10">No counties match this filter.</td></tr>';
 }
 ["search","filter"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",render));
 document.getElementById("reset").onclick=()=>{["2018","2022","2026"].forEach(y=>data[y]={});render()};
-document.getElementById("export").onclick=()=>{let out=["County,2018RepVotes,2018DemVotes,2018Margin,2022RepVotes,2022DemVotes,2022Margin,2026RepVotes,2026DemVotes,2026Margin,2022to2026Swing,2026PrecinctsReporting,2026PrecinctsTotal"];counties.forEach(c=>{let a=data[2018][c],b=data[2022][c],z=data[2026][c],vals=[c,a?.r??"",a?.d??"",margin(a)??"",b?.r??"",b?.d??"",margin(b)??"",z?.r??"",z?.d??"",margin(z)??"",margin(z)==null||margin(b)==null?"":margin(z)-margin(b),z?.p??"",z?.t??""];out.push(vals.join(","))});let blob=new Blob([out.join("\n")],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="georgia-governor-county-comparison.csv";a.click();URL.revokeObjectURL(url)};
+document.getElementById("export").onclick=()=>{let out=["County,2018RepVotes,2018DemVotes,2018Margin,2022RepVotes,2022DemVotes,2022Margin,2026RepVotes,2026DemVotes,2026Margin,2022to2026Swing,2026ReportingPct,2026PrecinctsReporting,2026PrecinctsTotal"];counties.forEach(c=>{let a=data[2018][c],b=data[2022][c],z=data[2026][c],vals=[c,a?.r??"",a?.d??"",margin(a)??"",b?.r??"",b?.d??"",margin(b)??"",z?.r??"",z?.d??"",margin(z)??"",margin(z)==null||margin(b)==null?"":margin(z)-margin(b),z?.p!=null&&z?.t>0?z.p/z.t*100:"",z?.p??"",z?.t??""];out.push(vals.join(","))});let blob=new Blob([out.join("\n")],{type:"text/csv"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="georgia-governor-county-comparison.csv";a.click();URL.revokeObjectURL(url)};
 render();
 </script></body></html>
