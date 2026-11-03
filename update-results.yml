@@ -1,0 +1,35 @@
+name: Update Georgia governor results
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out dashboard
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install workbook reader
+        run: pip install openpyxl
+      - name: Download and process official report
+        run: python scripts/update_results.py
+      - name: Save updated county data
+        run: |
+          if [[ -n "$(git status --porcelain data/2026.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/2026.json
+            git commit -m "Update 2026 Georgia governor results"
+            git push
+          else
+            echo "No new county results to publish."
+          fi
